@@ -32,7 +32,7 @@ function buildScalars(namespace, parentFolder) {
     { browseName: "UInt16Value", dataType: DataType.UInt16, value: 1000 },
     { browseName: "Int32Value", dataType: DataType.Int32, value: -100000 },
     { browseName: "UInt32Value", dataType: DataType.UInt32, value: 100000 },
-    { browseName: "Int64Value", dataType: DataType.Int64, value: [0, -1000000], is64: true },
+    { browseName: "Int64Value", dataType: DataType.Int64, value: [0, 1000000], is64: true },
     { browseName: "UInt64Value", dataType: DataType.UInt64, value: [0, 1000000], is64: true },
     { browseName: "FloatValue", dataType: DataType.Float, value: 3.14 },
     { browseName: "DoubleValue", dataType: DataType.Double, value: 3.141592653589793 },

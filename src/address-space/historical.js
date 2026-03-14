@@ -73,6 +73,12 @@ function buildHistorical(namespace, rootFolder, addressSpace) {
     pressureValue = 101.325 + 5 * Math.cos(t / 120) + (Math.random() - 0.5);
     histCounterValue++;
     histBoolValue = Math.random() > 0.5;
+
+    // Use setValueFromSource to trigger historical data recording
+    histTemp.setValueFromSource(new Variant({ dataType: DataType.Double, value: tempValue }));
+    histPressure.setValueFromSource(new Variant({ dataType: DataType.Double, value: pressureValue }));
+    histCounter.setValueFromSource(new Variant({ dataType: DataType.UInt32, value: histCounterValue }));
+    histBool.setValueFromSource(new Variant({ dataType: DataType.Boolean, value: histBoolValue }));
   }, 1000));
 }
 

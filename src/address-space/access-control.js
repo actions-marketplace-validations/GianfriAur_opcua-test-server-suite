@@ -3,6 +3,8 @@ const {
   Variant,
   StatusCodes,
   makeAccessLevelFlag,
+  WellKnownRoles,
+  PermissionType,
 } = require("node-opcua");
 
 function buildAccessControl(namespace, rootFolder) {
@@ -129,6 +131,14 @@ function buildAccessControl(namespace, rootFolder) {
 
   const operatorFolder = namespace.addFolder(folder, { browseName: "OperatorLevel" });
 
+  const operatorRolePerms = [
+    { roleId: WellKnownRoles.AuthenticatedUser, permissions: PermissionType.Read | PermissionType.Browse },
+    { roleId: WellKnownRoles.Operator, permissions: PermissionType.Read | PermissionType.Browse | PermissionType.Write },
+    { roleId: WellKnownRoles.ConfigureAdmin, permissions: PermissionType.Read | PermissionType.Browse | PermissionType.Write },
+    { roleId: WellKnownRoles.SecurityAdmin, permissions: PermissionType.Read | PermissionType.Browse | PermissionType.Write },
+    { roleId: WellKnownRoles.Engineer, permissions: PermissionType.Read | PermissionType.Browse | PermissionType.Write },
+  ];
+
   let opSetpoint = 50.0;
   namespace.addVariable({
     componentOf: operatorFolder,
@@ -136,6 +146,7 @@ function buildAccessControl(namespace, rootFolder) {
     dataType: DataType.Double,
     accessLevel: "CurrentRead | CurrentWrite",
     userAccessLevel: "CurrentRead | CurrentWrite",
+    rolePermissions: operatorRolePerms,
     value: {
       get: () => new Variant({ dataType: DataType.Double, value: opSetpoint }),
       set: (variant) => { opSetpoint = variant.value; return StatusCodes.Good; },
@@ -149,6 +160,7 @@ function buildAccessControl(namespace, rootFolder) {
     dataType: DataType.Int32,
     accessLevel: "CurrentRead | CurrentWrite",
     userAccessLevel: "CurrentRead | CurrentWrite",
+    rolePermissions: operatorRolePerms,
     value: {
       get: () => new Variant({ dataType: DataType.Int32, value: opSpeed }),
       set: (variant) => { opSpeed = variant.value; return StatusCodes.Good; },
@@ -162,6 +174,7 @@ function buildAccessControl(namespace, rootFolder) {
     dataType: DataType.Boolean,
     accessLevel: "CurrentRead | CurrentWrite",
     userAccessLevel: "CurrentRead | CurrentWrite",
+    rolePermissions: operatorRolePerms,
     value: {
       get: () => new Variant({ dataType: DataType.Boolean, value: opEnabled }),
       set: (variant) => { opEnabled = variant.value; return StatusCodes.Good; },

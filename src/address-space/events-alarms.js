@@ -11,6 +11,15 @@ function buildEventsAndAlarms(namespace, rootFolder) {
   const addressSpace = namespace.addressSpace;
   const eventsFolder = namespace.addFolder(rootFolder, { browseName: "Events" });
   const alarmsFolder = namespace.addFolder(rootFolder, { browseName: "Alarms" });
+  alarmsFolder.setEventNotifier(1);
+  // Register alarmsFolder as event source so alarms can use it as conditionSource
+  const serverObject = addressSpace.findNode("ns=0;i=2253");
+  if (serverObject) {
+    serverObject.addReference({
+      referenceType: "HasEventSource",
+      nodeId: alarmsFolder.nodeId,
+    });
+  }
 
   const simpleEventType = namespace.addEventType({
     browseName: "SimpleEventType",
@@ -135,7 +144,7 @@ function buildEventsAndAlarms(namespace, rootFolder) {
       : namespace.instantiateExclusiveLimitAlarm("ExclusiveLimitAlarmType", {
           browseName: "HighTemperatureAlarm",
           componentOf: alarmsFolder,
-          conditionSource: alarmSource,
+          conditionSource: alarmsFolder,
           inputNode: alarmSource,
           highHighLimit: 90,
           highLimit: 70,
@@ -150,7 +159,7 @@ function buildEventsAndAlarms(namespace, rootFolder) {
     namespace.instantiateNonExclusiveLimitAlarm("NonExclusiveLimitAlarmType", {
       browseName: "LevelAlarm",
       componentOf: alarmsFolder,
-      conditionSource: alarmSource,
+      conditionSource: alarmsFolder,
       inputNode: alarmSource,
       highHighLimit: 95,
       highLimit: 75,
@@ -181,12 +190,12 @@ function buildEventsAndAlarms(namespace, rootFolder) {
   }, 20000));
 
   try {
-    namespace.instantiateOffNormalAlarm("OffNormalAlarmType", {
+    namespace.instantiateOffNormalAlarm({
       browseName: "OffNormalAlarm",
       componentOf: alarmsFolder,
-      conditionSource: offNormalSource,
-      inputNode: offNormalSource,
-      normalState: offNormalSource,
+      conditionSource: alarmsFolder,
+      inputNode: offNormalSource.nodeId,
+      normalState: offNormalSource.nodeId,
     });
   } catch (err) {
     console.warn("[Events] Could not create OffNormalAlarm:", err.message);

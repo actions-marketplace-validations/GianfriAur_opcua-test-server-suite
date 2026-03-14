@@ -105,8 +105,90 @@ async function main() {
     serverOptions.certificateFile = config.certificateFile;
     serverOptions.privateKeyFile = config.privateKeyFile;
 
+    // =========================================================================
+    // PKI setup — Certificate and CRL management for node-opcua
+    // =========================================================================
+    //
+    // node-opcua uses OPCUACertificateManager to manage the PKI trust chain.
+    // The PKI directory structure follows the OPC UA GDS (Global Discovery
+    // Service) convention:
+    //
+    //   pki/
+    //     trusted/certs/   — client certificates explicitly trusted
+    //     trusted/crl/     — (unused here, kept for convention)
+    //     issuers/certs/   — CA certificates that signed the client certs
+    //     issuers/crl/     — CRL (Certificate Revocation List) for those CAs
+    //     rejected/certs/  — auto-populated by node-opcua for rejected certs
+    //
+    // PROBLEM 1: BadCertificateRevocationUnknown (0x801b0000)
+    //   When a client connects with a certificate signed by a CA, node-opcua
+    //   validates the certificate chain. Part of this validation checks whether
+    //   the certificate has been revoked by consulting the CA's CRL. If no CRL
+    //   is found in issuers/crl/, node-opcua rejects the connection with
+    //   BadCertificateRevocationUnknown. This happens even if autoAcceptCerts
+    //   is true, because revocation checking is a separate step from trust
+    //   evaluation.
+    //
+    //   Solution: generate-certs.sh now creates an empty CRL signed by the CA
+    //   (ca-crl.pem). We copy it into issuers/crl/ BEFORE calling
+    //   certificateManager.initialize(), because node-opcua loads and indexes
+    //   the CRL files during initialization. Copying after initialize() has no
+    //   effect — the CRL won't be found when the first client connects.
+    //
+    // PROBLEM 2: BadIdentityTokenRejected (0x80210000) for X509 user auth
+    //   node-opcua uses TWO separate certificate managers:
+    //   - serverCertificateManager: validates the TLS-level client certificate
+    //     presented during the OpenSecureChannel handshake (OPN message).
+    //   - userCertificateManager: validates the X509 certificate presented as
+    //     a UserIdentityToken during ActivateSession.
+    //   If userCertificateManager is not configured, node-opcua has no way to
+    //   verify the user certificate's trust chain and rejects it outright.
+    //
+    //   Solution: when authCertificate is enabled, we create a second
+    //   OPCUACertificateManager with its own PKI directory (user-pki/),
+    //   populated with the same CA cert, CRL, and trusted client certs.
+    //   This allows node-opcua to validate user X509 tokens independently
+    //   from transport-level certificates.
+    //
+    // IMPORTANT: populatePki() must run BEFORE certificateManager.initialize()
+    // for both managers. The initialize() method scans the PKI directories
+    // and builds an internal index; files added after initialization are not
+    // picked up for revocation checking.
+    // =========================================================================
+
     const pkiRoot = path.join(process.env.OPCUA_ROOT || path.resolve(__dirname, ".."), "pki");
     fs.mkdirSync(pkiRoot, { recursive: true });
+
+    const caCrlFile = path.join(path.dirname(config.caCertFile), "ca-crl.pem");
+
+    function populatePki(root) {
+      const dirs = {
+        trustedCerts: path.join(root, "trusted", "certs"),
+        trustedCrl: path.join(root, "trusted", "crl"),
+        issuersCerts: path.join(root, "issuers", "certs"),
+        issuersCrl: path.join(root, "issuers", "crl"),
+      };
+      for (const d of Object.values(dirs)) fs.mkdirSync(d, { recursive: true });
+
+      // Copy trusted client certs
+      if (fs.existsSync(config.trustedCertsDir)) {
+        for (const f of fs.readdirSync(config.trustedCertsDir)) {
+          if (f.endsWith(".pem") || f.endsWith(".der")) {
+            try { fs.copyFileSync(path.join(config.trustedCertsDir, f), path.join(dirs.trustedCerts, f)); } catch (e) { }
+          }
+        }
+      }
+      // Copy CA certificate to issuers
+      if (fs.existsSync(config.caCertFile)) {
+        try { fs.copyFileSync(config.caCertFile, path.join(dirs.issuersCerts, "ca-cert.pem")); } catch (e) { }
+      }
+      // Copy CA CRL to issuers
+      if (fs.existsSync(caCrlFile)) {
+        try { fs.copyFileSync(caCrlFile, path.join(dirs.issuersCrl, "ca-crl.pem")); } catch (e) { }
+      }
+    }
+
+    populatePki(pkiRoot);
 
     const certificateManager = new OPCUACertificateManager({
       automaticallyAcceptUnknownCertificate: config.autoAcceptCerts,
@@ -114,26 +196,19 @@ async function main() {
     });
     await certificateManager.initialize();
 
-    const pkiTrustedDir = path.join(pkiRoot, "trusted", "certs");
-    if (fs.existsSync(config.trustedCertsDir)) {
-      const files = fs.readdirSync(config.trustedCertsDir);
-      for (const f of files) {
-        if (f.endsWith(".pem") || f.endsWith(".der")) {
-          const src = path.join(config.trustedCertsDir, f);
-          const dst = path.join(pkiTrustedDir, f);
-          try { fs.copyFileSync(src, dst); } catch (e) { }
-        }
-      }
-    }
-
-    const pkiIssuersDir = path.join(pkiRoot, "issuers", "certs");
-    if (fs.existsSync(config.caCertFile)) {
-      try {
-        fs.copyFileSync(config.caCertFile, path.join(pkiIssuersDir, "ca-cert.pem"));
-      } catch (e) { }
-    }
-
     serverOptions.serverCertificateManager = certificateManager;
+
+    // Create a separate certificate manager for user X509 certificate authentication
+    if (config.authCertificate) {
+      const userPkiRoot = path.join(process.env.OPCUA_ROOT || path.resolve(__dirname, ".."), "user-pki");
+      populatePki(userPkiRoot);
+      const userCertificateManager = new OPCUACertificateManager({
+        automaticallyAcceptUnknownCertificate: config.autoAcceptCerts,
+        rootFolder: userPkiRoot,
+      });
+      await userCertificateManager.initialize();
+      serverOptions.userCertificateManager = userCertificateManager;
+    }
   } else if (needsCerts) {
     console.warn("[Certs] Certificate files not found, server will generate self-signed certs");
   }

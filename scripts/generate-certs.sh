@@ -11,7 +11,7 @@ echo "Output directory: ${CERTS_DIR}"
 
 # Clean and create directories
 rm -rf "${CERTS_DIR}/ca" "${CERTS_DIR}/server" "${CERTS_DIR}/client" "${CERTS_DIR}/self-signed" "${CERTS_DIR}/expired"
-mkdir -p "${CERTS_DIR}"/{ca,server,client,self-signed,expired,trusted,rejected,pki/{own/certs,own/private,trusted/certs,rejected/certs,issuers/certs}}
+mkdir -p "${CERTS_DIR}"/{ca,server,client,self-signed,expired,trusted,rejected,pki/{own/certs,own/private,trusted/certs,rejected/certs,issuers/certs,issuers/crl}}
 
 # ========================
 # 1. CA Root Certificate
@@ -28,6 +28,34 @@ openssl req -new -x509 -key "${CERTS_DIR}/ca/ca-key.pem" \
   2>/dev/null
 
 echo "  CA certificate created"
+
+# Generate CRL (Certificate Revocation List) for the CA
+# node-opcua requires a CRL to verify certificate revocation status
+touch "${CERTS_DIR}/ca/index.txt"
+echo "01" > "${CERTS_DIR}/ca/crlnumber"
+
+cat > "${CERTS_DIR}/ca/openssl-ca.cnf" << CAEOF
+[ ca ]
+default_ca = CA_default
+
+[ CA_default ]
+dir               = ${CERTS_DIR}/ca
+database          = ${CERTS_DIR}/ca/index.txt
+crlnumber         = ${CERTS_DIR}/ca/crlnumber
+default_md        = sha256
+default_crl_days  = 3650
+certificate       = ${CERTS_DIR}/ca/ca-cert.pem
+private_key       = ${CERTS_DIR}/ca/ca-key.pem
+CAEOF
+
+openssl ca -gencrl \
+  -config "${CERTS_DIR}/ca/openssl-ca.cnf" \
+  -out "${CERTS_DIR}/ca/ca-crl.pem" \
+  2>/dev/null
+
+openssl crl -in "${CERTS_DIR}/ca/ca-crl.pem" -outform der -out "${CERTS_DIR}/ca/ca-crl.der" 2>/dev/null
+
+echo "  CA CRL created"
 
 # ========================
 # 2. Server Certificate (signed by CA)
@@ -203,6 +231,8 @@ cp "${CERTS_DIR}/server/cert.pem" "${CERTS_DIR}/pki/own/certs/"
 cp "${CERTS_DIR}/server/key.pem" "${CERTS_DIR}/pki/own/private/"
 cp "${CERTS_DIR}/client/cert.pem" "${CERTS_DIR}/pki/trusted/certs/"
 cp "${CERTS_DIR}/ca/ca-cert.pem" "${CERTS_DIR}/pki/issuers/certs/"
+cp "${CERTS_DIR}/ca/ca-crl.pem" "${CERTS_DIR}/pki/issuers/crl/"
+cp "${CERTS_DIR}/ca/ca-crl.der" "${CERTS_DIR}/pki/issuers/crl/" 2>/dev/null || true
 
 # Self-signed goes to rejected by default
 cp "${CERTS_DIR}/self-signed/cert.pem" "${CERTS_DIR}/rejected/"
@@ -212,6 +242,8 @@ rm -f "${CERTS_DIR}/server/server.csr" "${CERTS_DIR}/server/server-ext.cnf"
 rm -f "${CERTS_DIR}/client/client.csr" "${CERTS_DIR}/client/client-ext.cnf"
 rm -f "${CERTS_DIR}/expired/expired.csr"
 rm -f "${CERTS_DIR}/ca/ca-cert.srl"
+rm -f "${CERTS_DIR}/ca/openssl-ca.cnf" "${CERTS_DIR}/ca/index.txt" "${CERTS_DIR}/ca/index.txt.old" "${CERTS_DIR}/ca/index.txt.attr"
+rm -f "${CERTS_DIR}/ca/crlnumber" "${CERTS_DIR}/ca/crlnumber.old"
 
 echo ""
 echo "============================================"
