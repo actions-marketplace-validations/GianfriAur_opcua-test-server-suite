@@ -22,6 +22,7 @@ Objects (ns=0)
     ├── Alarms           → 3 alarms + 2 source variables
     ├── Historical       → 4 variables with history
     ├── Structures       → Nested objects, collections, deep nesting
+    ├── ExtensionObjects → Custom structured types (TestPointXYZ, TestRangeStruct)
     └── AccessControl    → 50 variables with different access levels
 ```
 
@@ -70,6 +71,7 @@ Each address space section can be independently enabled/disabled via environment
 | Events & Alarms | `OPCUA_ENABLE_EVENTS` | `true` |
 | Historical | `OPCUA_ENABLE_HISTORICAL` | `true` |
 | Structures | `OPCUA_ENABLE_STRUCTURES` | `true` |
+| ExtensionObjects | *(always enabled)* | — |
 | Views | `OPCUA_ENABLE_VIEWS` | `true` |
 | AccessControl | *(always enabled)* | — |
 

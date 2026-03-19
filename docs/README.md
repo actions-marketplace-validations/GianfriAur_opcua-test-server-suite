@@ -15,9 +15,10 @@ A comprehensive OPC UA server suite designed for testing OPC UA client libraries
 9. [Events & Alarms](events-and-alarms.md) — Custom event types, periodic events, and 3 alarm types
 10. [Historical Data](historical-data.md) — 4 variables with history access
 11. [Structures](structures.md) — Nested objects, collections, and deep nesting for browse tests
-12. [Access Control](access-control.md) — Access levels, role-based folders, and all type/access combinations
-13. [Views](views.md) — 4 OPC UA views for filtered browsing
-14. [Testing Guide](testing-guide.md) — Practical scenarios and how to test each feature
+12. [Extension Objects](extension-objects.md) — Custom structured types (TestPointXYZ, TestRangeStruct)
+13. [Access Control](access-control.md) — Access levels, role-based folders, and all type/access combinations
+14. [Views](views.md) — 4 OPC UA views for filtered browsing
+15. [Testing Guide](testing-guide.md) — Practical scenarios and how to test each feature
 
 ## Quick Start
 
@@ -37,7 +38,7 @@ docker compose down
 
 ## Architecture
 
-A single codebase (`src/`) is instantiated 8 times via `docker-compose.yml`, each with different environment variables controlling security, authentication, and features. All servers expose the same address space (~267 nodes).
+A single codebase (`src/`) is instantiated 8 times via `docker-compose.yml`, each with different environment variables controlling security, authentication, and features. All servers expose the same address space (~270 nodes).
 
 ```
 Client ──► opcua-no-security    (4840)  No security, anonymous only
@@ -67,6 +68,7 @@ Client ──► opcua-no-security    (4840)  No security, anonymous only
 | Alarms | 3 (+2 source variables) |
 | Historical variables | 4 |
 | Structure objects | 4 + 5 collection + 10 deep |
+| Extension objects | 2 |
 | Access control variables | 50 |
 | Views | 4 |
-| **Total nodes** | **~267** |
+| **Total nodes** | **~270** |

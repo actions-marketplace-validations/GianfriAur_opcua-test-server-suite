@@ -272,7 +272,55 @@ Practical test scenarios organized by OPC UA feature. Each scenario lists the se
 
 ---
 
-## 9. Browsing & Navigation
+## 9. Extension Objects
+
+### Read custom structured type
+
+- **Server:** `opcua-no-security` (4840)
+- **Steps:**
+  1. Browse to `ExtensionObjects/PointValue`
+  2. Read the value
+- **Expect:** ExtensionObject of type `TestPointXYZ` with `{X: 1.5, Y: 2.5, Z: 3.5}`
+
+### Write custom structured type
+
+- **Server:** `opcua-no-security` (4840)
+- **Steps:**
+  1. Write a new `TestPointXYZ` value `{X: 10.0, Y: 20.0, Z: 30.0}` to `ExtensionObjects/PointValue`
+  2. Read it back
+- **Expect:** Value matches `{X: 10.0, Y: 20.0, Z: 30.0}`
+
+### Read-only extension object
+
+- **Server:** `opcua-no-security` (4840)
+- **Steps:**
+  1. Read `ExtensionObjects/RangeValue`
+  2. Attempt to write a new value
+- **Expect:** Read returns `TestRangeStruct` with `{Min: 0.0, Max: 100.0, Value: 42.5}`, write returns `BadNotWritable`
+
+---
+
+## 10. Operation Limits
+
+### Read with node limit
+
+- **Server:** `opcua-no-security` (4840) — configured with `OPCUA_MAX_NODES_PER_READ=5`
+- **Steps:**
+  1. Build a Read request with 10 node IDs
+  2. Send the request
+- **Expect:** Server rejects or limits the request (max 5 nodes per read)
+
+### Write with node limit
+
+- **Server:** `opcua-no-security` (4840) — configured with `OPCUA_MAX_NODES_PER_WRITE=5`
+- **Steps:**
+  1. Build a Write request with 10 node IDs
+  2. Send the request
+- **Expect:** Server rejects or limits the request (max 5 nodes per write)
+
+---
+
+## 11. Browsing & Navigation
 
 ### Recursive browse
 
@@ -280,7 +328,7 @@ Practical test scenarios organized by OPC UA feature. Each scenario lists the se
 - **Steps:**
   1. Start at `Objects/TestServer`
   2. Recursively browse all nodes
-- **Expect:** ~267 total nodes discovered
+- **Expect:** ~270 total nodes discovered
 
 ### Deep nesting
 
@@ -299,7 +347,7 @@ Practical test scenarios organized by OPC UA feature. Each scenario lists the se
 
 ---
 
-## 10. Access Control
+## 12. Access Control
 
 ### Access level attributes
 
@@ -321,7 +369,7 @@ Practical test scenarios organized by OPC UA feature. Each scenario lists the se
 
 ---
 
-## 11. Discovery
+## 13. Discovery
 
 ### Find servers
 

@@ -2,7 +2,7 @@
 
 A comprehensive, ready-to-use OPC UA server suite built specifically for **integration testing of OPC UA client libraries**. It provides 8 pre-configured server instances covering every major security policy, authentication method, and communication mode defined by the OPC UA specification.
 
-Whether you're building an OPC UA client in Rust, C#, Python, Go, Java, or any other language, this suite gives you a realistic test environment with ~267 nodes, 12 callable methods, dynamic variables, events, alarms, historical data, and structured objects — all running with a single `docker compose up`.
+Whether you're building an OPC UA client in Rust, C#, Python, Go, Java, or any other language, this suite gives you a realistic test environment with ~270 nodes, 12 callable methods, dynamic variables, events, alarms, historical data, structured objects, and custom extension objects — all running with a single `docker compose up`.
 
 ## What's Inside
 
@@ -76,7 +76,7 @@ This repository is also a **reusable GitHub Action**. Add a single step to your 
 steps:
   - uses: actions/checkout@v4
 
-  - uses: GianfriAur/opcua-test-server-suite@v1.1.3
+  - uses: GianfriAur/opcua-test-server-suite@v1.1.4
 
   - run: cargo test  # or npm test, pytest, dotnet test, etc.
 ```
@@ -85,7 +85,7 @@ You can select which servers to start, set timeouts, and access the generated ce
 
 ```yaml
 - id: opcua
-  uses: GianfriAur/opcua-test-server-suite@v1.1.3
+  uses: GianfriAur/opcua-test-server-suite@v1.1.4
   with:
     servers: 'no-security,userpass,certificate'
     wait-timeout: '90'
@@ -116,6 +116,7 @@ Detailed documentation is available in the [`docs/`](docs/) folder:
 | [Events & Alarms](docs/events-and-alarms.md) | Custom event types, periodic events, alarm conditions |
 | [Historical Data](docs/historical-data.md) | HistoryRead operations and historical variables |
 | [Structures](docs/structures.md) | Nested objects, collections, deep nesting |
+| [Extension Objects](docs/extension-objects.md) | Custom structured types (TestPointXYZ, TestRangeStruct) |
 | [Access Control](docs/access-control.md) | Access levels, role-based folders, type/access combinations |
 | [Views](docs/views.md) | 4 OPC UA views for filtered browsing |
 | [Testing Guide](docs/testing-guide.md) | Step-by-step test scenarios for every feature |

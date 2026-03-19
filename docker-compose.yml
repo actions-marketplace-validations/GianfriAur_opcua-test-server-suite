@@ -23,6 +23,8 @@ services:
       OPCUA_AUTH_USERS: "false"
       OPCUA_AUTH_CERTIFICATE: "false"
       OPCUA_DISCOVERY_URL: "opc.tcp://opcua-discovery:4844"
+      OPCUA_MAX_NODES_PER_READ: "5"
+      OPCUA_MAX_NODES_PER_WRITE: "5"
     volumes:
       - ./certs:/app/certs:ro
     depends_on:
@@ -183,6 +185,8 @@ services:
       OPCUA_CERTIFICATE_FILE: "/app/certs/server/cert.pem"
       OPCUA_PRIVATE_KEY_FILE: "/app/certs/server/key.pem"
       OPCUA_DISCOVERY_URL: "opc.tcp://opcua-discovery:4844"
+      OPCUA_MAX_NODES_PER_READ: "5"
+      OPCUA_MAX_NODES_PER_WRITE: "5"
     volumes:
       - ./certs:/app/certs:ro
     depends_on:

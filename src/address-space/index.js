@@ -7,6 +7,7 @@ const { buildHistorical } = require("./historical");
 const { buildStructures } = require("./structures");
 const { buildViews } = require("./views");
 const { buildAccessControl } = require("./access-control");
+const { buildExtensionObjects } = require("./extension-objects");
 
 async function constructAddressSpace(server) {
   const addressSpace = server.engine.addressSpace;
@@ -43,6 +44,9 @@ async function constructAddressSpace(server) {
     console.log("[AddressSpace] Building structures...");
     buildStructures(namespace, rootFolder);
   }
+
+  console.log("[AddressSpace] Building extension objects...");
+  buildExtensionObjects(namespace, rootFolder, addressSpace);
 
   console.log("[AddressSpace] Building access control...");
   buildAccessControl(namespace, rootFolder);

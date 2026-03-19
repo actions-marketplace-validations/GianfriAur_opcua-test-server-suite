@@ -52,6 +52,12 @@ const config = {
   enableDynamic: parseBool(process.env.OPCUA_ENABLE_DYNAMIC, true),
   enableStructures: parseBool(process.env.OPCUA_ENABLE_STRUCTURES, true),
   enableViews: parseBool(process.env.OPCUA_ENABLE_VIEWS, true),
+
+  customTypesFile: process.env.OPCUA_CUSTOM_TYPES_FILE || path.join(ROOT, "config/custom-types.xml"),
+
+  maxNodesPerRead: parseIntEnv(process.env.OPCUA_MAX_NODES_PER_READ, 0),
+  maxNodesPerWrite: parseIntEnv(process.env.OPCUA_MAX_NODES_PER_WRITE, 0),
+  maxNodesPerBrowse: parseIntEnv(process.env.OPCUA_MAX_NODES_PER_BROWSE, 0),
 };
 
 module.exports = config;

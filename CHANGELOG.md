@@ -1,5 +1,36 @@
 # Changelog
 
+## v1.1.4 — 2026-03-19
+
+### Address Space
+
+- **extension-objects.js**: Added new `ExtensionObjects` module with custom
+  structured data types defined via a NodeSet XML file (`config/custom-types.xml`).
+  Two new variables: `PointValue` (RW, `TestPointXYZ` with X/Y/Z Double fields)
+  and `RangeValue` (R, `TestRangeStruct` with Min/Max/Value Double fields).
+  Custom types are loaded as an additional nodeset at server startup.
+
+### Server
+
+- **config.js / index.js**: Added configurable OPC UA operation limits via
+  environment variables: `OPCUA_MAX_NODES_PER_READ`, `OPCUA_MAX_NODES_PER_WRITE`,
+  `OPCUA_MAX_NODES_PER_BROWSE`. When set to a value > 0, the server binds the
+  corresponding standard OPC UA ServerCapabilities nodes (`i=11705`, `i=11707`,
+  `i=11710`). Default is `0` (unlimited).
+
+- **config.js**: Added `OPCUA_CUSTOM_TYPES_FILE` environment variable to specify
+  the path to a custom NodeSet XML file (default: `config/custom-types.xml`).
+
+### Dependencies
+
+- **package.json**: Bumped `node-opcua` from `^2.133.0` to `^2.165.0`.
+
+### Docker
+
+- **docker-compose.yml**: Added `OPCUA_MAX_NODES_PER_READ: "5"` and
+  `OPCUA_MAX_NODES_PER_WRITE: "5"` to `opcua-no-security` and
+  `opcua-all-security` services for operation limit testing.
+
 ## v1.1.3 — 2026-03-18
 
 ### Actions

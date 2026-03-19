@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UANodeSet xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd"
+           xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd">
+  <NamespaceUris>
+    <Uri>urn:opcua:test-server:custom-types</Uri>
+  </NamespaceUris>
+
+  <!-- TestPointXYZ DataType -->
+  <UADataType NodeId="ns=1;i=3000" BrowseName="1:TestPointXYZ" ParentNodeId="i=22">
+    <DisplayName>TestPointXYZ</DisplayName>
+    <References>
+      <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
+      <Reference ReferenceType="HasEncoding">ns=1;i=3010</Reference>
+    </References>
+    <Definition Name="TestPointXYZ">
+      <Field Name="X" DataType="i=11" ValueRank="-1"/>
+      <Field Name="Y" DataType="i=11" ValueRank="-1"/>
+      <Field Name="Z" DataType="i=11" ValueRank="-1"/>
+    </Definition>
+  </UADataType>
+
+  <!-- Binary Encoding for TestPointXYZ -->
+  <UAObject NodeId="ns=1;i=3010" BrowseName="Default Binary" SymbolicName="TestPointXYZ_Encoding_DefaultBinary">
+    <DisplayName>Default Binary</DisplayName>
+    <References>
+      <Reference ReferenceType="HasEncoding" IsForward="false">ns=1;i=3000</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=76</Reference>
+    </References>
+  </UAObject>
+
+  <!-- TestRangeStruct DataType -->
+  <UADataType NodeId="ns=1;i=3001" BrowseName="1:TestRangeStruct" ParentNodeId="i=22">
+    <DisplayName>TestRangeStruct</DisplayName>
+    <References>
+      <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
+      <Reference ReferenceType="HasEncoding">ns=1;i=3011</Reference>
+    </References>
+    <Definition Name="TestRangeStruct">
+      <Field Name="Min" DataType="i=11" ValueRank="-1"/>
+      <Field Name="Max" DataType="i=11" ValueRank="-1"/>
+      <Field Name="Value" DataType="i=11" ValueRank="-1"/>
+    </Definition>
+  </UADataType>
+
+  <!-- Binary Encoding for TestRangeStruct -->
+  <UAObject NodeId="ns=1;i=3011" BrowseName="Default Binary" SymbolicName="TestRangeStruct_Encoding_DefaultBinary">
+    <DisplayName>Default Binary</DisplayName>
+    <References>
+      <Reference ReferenceType="HasEncoding" IsForward="false">ns=1;i=3001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=76</Reference>
+    </References>
+  </UAObject>
+</UANodeSet>

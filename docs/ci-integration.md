@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: GianfriAur/opcua-test-server-suite@v1.1.3
+      - uses: GianfriAur/opcua-test-server-suite@v1.1.4
 
       - run: cargo test  # or npm test, pytest, dotnet test, etc.
 ```
@@ -39,7 +39,7 @@ jobs:
 
       - name: Start OPC UA test servers
         id: opcua
-        uses: GianfriAur/opcua-test-server-suite@v1.1.3
+        uses: GianfriAur/opcua-test-server-suite@v1.1.4
         with:
           # Which servers to start (default: all)
           servers: 'no-security,userpass,certificate'
@@ -66,7 +66,7 @@ jobs:
 
 | Input | Default | Description |
 |---|---|---|
-| `image-tag` | `latest` | Docker image tag. Use `latest` for newest, or pin a version like `v1.1.3` |
+| `image-tag` | `latest` | Docker image tag. Use `latest` for newest, or pin a version like `v1.1.4` |
 | `servers` | `all` | Comma-separated list of servers to start. Options: `no-security`, `userpass`, `certificate`, `all-security`, `discovery`, `auto-accept`, `sign-only`, `legacy-security` |
 | `wait-timeout` | `120` | Seconds to wait for all servers to be ready before failing |
 
@@ -82,17 +82,17 @@ Start only the servers you need to save CI time:
 
 ```yaml
 # Only no-security for basic tests
-- uses: GianfriAur/opcua-test-server-suite@v1.1.3
+- uses: GianfriAur/opcua-test-server-suite@v1.1.4
   with:
     servers: 'no-security'
 
 # Security tests only
-- uses: GianfriAur/opcua-test-server-suite@v1.1.3
+- uses: GianfriAur/opcua-test-server-suite@v1.1.4
   with:
     servers: 'userpass,certificate,all-security'
 
 # All servers (default)
-- uses: GianfriAur/opcua-test-server-suite@v1.1.3
+- uses: GianfriAur/opcua-test-server-suite@v1.1.4
 ```
 
 ### Available Servers and Ports
@@ -114,7 +114,7 @@ The action makes all generated certificates available on the runner filesystem v
 
 ```yaml
 - id: opcua
-  uses: GianfriAur/opcua-test-server-suite@v1.1.3
+  uses: GianfriAur/opcua-test-server-suite@v1.1.4
 
 - run: |
     # Trusted client certificate (signed by CA)
@@ -137,7 +137,7 @@ The action makes all generated certificates available on the runner filesystem v
 
 ```yaml
 # Pin to a specific release (recommended for stability)
-- uses: GianfriAur/opcua-test-server-suite@v1.1.3
+- uses: GianfriAur/opcua-test-server-suite@v1.1.4
 
 # Use latest from main branch
 - uses: GianfriAur/opcua-test-server-suite@main

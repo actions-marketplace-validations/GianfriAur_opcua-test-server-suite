@@ -354,6 +354,20 @@ RO values: true, -42, 42, 3.14, "immutable", 2024-01-01, 128, 2.71
 RW/WO values: false, 0, 0, 0.0, "", now, 0, 0.0
 ```
 
+### ExtensionObjects — 2 variables with custom structured types
+
+```
+CUSTOM TYPES (defined in config/custom-types.xml, namespace urn:opcua:test-server:custom-types):
+TestPointXYZ       fields: X:Double, Y:Double, Z:Double
+TestRangeStruct    fields: Min:Double, Max:Double, Value:Double
+
+VARIABLES:
+ExtensionObjects/PointValue    TestPointXYZ     RW    {X:1.5, Y:2.5, Z:3.5}
+ExtensionObjects/RangeValue    TestRangeStruct  R     {Min:0.0, Max:100.0, Value:42.5}
+```
+
+PointValue supports read/write of the full ExtensionObject. RangeValue is read-only.
+
 ### Views — 4 views under standard Views folder (ns=0;i=87)
 
 ```
@@ -379,6 +393,7 @@ src/
     ├── events-alarms.js         buildEventsAndAlarms() + stopEvents(): event types + emitter + alarm instances
     ├── historical.js            buildHistorical() + stopHistorical(): 4 vars + installHistoricalDataNode
     ├── structures.js            buildStructures(): objects with child variables, helper addStructField()
+    ├── extension-objects.js     buildExtensionObjects(): custom types from NodeSet XML (TestPointXYZ, TestRangeStruct)
     ├── access-control.js        buildAccessControl(): access levels + role folders + AllCombinations
     └── views.js                 buildViews(): 4 views referencing existing folders
 ```
@@ -462,6 +477,10 @@ OPCUA_ENABLE_METHODS          bool    true
 OPCUA_ENABLE_DYNAMIC          bool    true
 OPCUA_ENABLE_STRUCTURES       bool    true
 OPCUA_ENABLE_VIEWS            bool    true
+OPCUA_CUSTOM_TYPES_FILE       path    config/custom-types.xml  NodeSet XML for custom structured types
+OPCUA_MAX_NODES_PER_READ      int     0           Max nodes per Read request (0=unlimited)
+OPCUA_MAX_NODES_PER_WRITE     int     0           Max nodes per Write request (0=unlimited)
+OPCUA_MAX_NODES_PER_BROWSE    int     0           Max nodes per Browse request (0=unlimited)
 OPCUA_ROOT                    path    (parent of src/)  Root dir for resolving relative paths
 ```
 
@@ -483,11 +502,12 @@ Event Types:          3
 Alarms:               3 (+2 sources)
 Historical:           4
 Structures:          46 vars in 19 objects
+Extension Objects:    2
 Access Control:      50
 Views:                4
-Folders:             21
+Folders:             22
 ─────────────────────────
-TOTAL:              ~267 nodes
+TOTAL:              ~270 nodes
 ```
 
 ## Expected Error Codes

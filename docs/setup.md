@@ -104,3 +104,7 @@ All configuration is done via environment variables in `docker-compose.yml`. See
 | `OPCUA_ENABLE_DYNAMIC` | `true` | Enable dynamic (time-varying) variables |
 | `OPCUA_ENABLE_STRUCTURES` | `true` | Enable structured objects |
 | `OPCUA_ENABLE_VIEWS` | `true` | Enable OPC UA views |
+| `OPCUA_CUSTOM_TYPES_FILE` | `config/custom-types.xml` | Path to custom NodeSet XML file for extension object types |
+| `OPCUA_MAX_NODES_PER_READ` | `0` | Max nodes per Read request (0 = unlimited) |
+| `OPCUA_MAX_NODES_PER_WRITE` | `0` | Max nodes per Write request (0 = unlimited) |
+| `OPCUA_MAX_NODES_PER_BROWSE` | `0` | Max nodes per Browse request (0 = unlimited) |

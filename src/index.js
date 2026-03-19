@@ -97,6 +97,7 @@ async function main() {
     nodeset_filename: [
       nodesets.standard,
       nodesets.di,
+      path.join(config.customTypesFile),
     ],
   };
 
@@ -268,6 +269,26 @@ async function main() {
   console.log("[Server] Initialized");
 
   await constructAddressSpace(server);
+
+  // Set server operation limits if configured
+  const addressSpace = server.engine.addressSpace;
+  const { DataType: DT, Variant: V } = require("node-opcua");
+  const setLimit = (nodeId, value) => {
+    if (value > 0) {
+      try {
+        const node = addressSpace.findNode(nodeId);
+        if (node) {
+          node.bindVariable({
+            get() { return new V({ dataType: DT.UInt32, value: value }); },
+          }, true);
+          console.log(`[Server] Set operation limit ${nodeId} = ${value}`);
+        }
+      } catch (e) {}
+    }
+  };
+  setLimit("i=11705", config.maxNodesPerRead);
+  setLimit("i=11707", config.maxNodesPerWrite);
+  setLimit("i=11710", config.maxNodesPerBrowse);
 
   await server.start();
 
