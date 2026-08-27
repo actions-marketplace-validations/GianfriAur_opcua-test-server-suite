@@ -1,6 +1,30 @@
-# OPC UA Test Server Suite
+<h1 align="center"><strong>OPC UA Test Suite</strong></h1>
 
-A comprehensive, ready-to-use OPC UA server suite built specifically for **integration testing of OPC UA client libraries**. It provides 8 pre-configured server instances covering every major security policy, authentication method, and communication mode defined by the OPC UA specification.
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="assets/logo-light.svg">
+    <img alt="OPC UA Test Suite" src="./assets/logo-light.svg" width="435">
+  </picture>
+</div>
+
+---
+
+> ## Deprecated
+>
+> **This project has been deprecated in favor of [`php-opcua/uanetstandard-test-suite`](https://github.com/php-opcua/uanetstandard-test-suite)**, a complete rewrite based on the [OPC Foundation UA-.NETStandard](https://github.com/OPCFoundation/UA-.NETStandard) reference implementation.
+>
+> **Why?** UA-.NETStandard is maintained directly by the OPC Foundation — the organization that defines the OPC UA specification. This makes it the de facto standard: protocol behavior, binary encoding, and security are as close to the spec as possible. Testing against the reference implementation gives you higher confidence in real-world interoperability than testing against a third-party stack.
+>
+> **The new suite is a drop-in replacement** — same ports, same endpoints, same address space, same users, same certificate layout. See the **[Migration Guide](docs/migration.md)** for details.
+>
+> This repository will no longer receive updates. All new features and fixes will be in [`uanetstandard-test-suite`](https://github.com/php-opcua/uanetstandard-test-suite).
+>
+> We apologize for any inconvenience. The migration is straightforward — the new suite is a drop-in replacement and most test code requires no changes.
+
+---
+
+A comprehensive, ready-to-use OPC UA suite built specifically for **integration testing of OPC UA client libraries**. It provides 8 pre-configured server instances covering every major security policy, authentication method, and communication mode defined by the OPC UA specification.
 
 Whether you're building an OPC UA client in Rust, C#, Python, Go, Java, or any other language, this suite gives you a realistic test environment with ~270 nodes, 12 callable methods, dynamic variables, events, alarms, historical data, structured objects, and custom extension objects — all running with a single `docker compose up`.
 
@@ -76,7 +100,7 @@ This repository is also a **reusable GitHub Action**. Add a single step to your 
 steps:
   - uses: actions/checkout@v4
 
-  - uses: GianfriAur/opcua-test-server-suite@v1.1.4
+  - uses: php-opcua/opcua-test-suite@v1.1.5
 
   - run: cargo test  # or npm test, pytest, dotnet test, etc.
 ```
@@ -85,7 +109,7 @@ You can select which servers to start, set timeouts, and access the generated ce
 
 ```yaml
 - id: opcua
-  uses: GianfriAur/opcua-test-server-suite@v1.1.4
+  uses: php-opcua/opcua-test-suite@v1.1.5
   with:
     servers: 'no-security,userpass,certificate'
     wait-timeout: '90'
@@ -95,7 +119,7 @@ You can select which servers to start, set timeouts, and access the generated ce
     OPCUA_CERTS_DIR: ${{ steps.opcua.outputs.certs-dir }}
 ```
 
-For real-world usage examples, see the CI workflows in [opcua-php-client](https://github.com/GianfriAur/opcua-php-client), [opcua-php-client-session-manager](https://github.com/GianfriAur/opcua-php-client-session-manager), and [opcua-laravel-client](https://github.com/GianfriAur/opcua-laravel-client).
+For real-world usage examples, see the CI workflows in [opcua-client](https://github.com/php-opcua/opcua-client), [opcua-session-manager](https://github.com/php-opcua/opcua-session-manager), and [laravel-opcua](https://github.com/php-opcua/laravel-opcua).
 
 For the full integration guide with all options, certificate usage, version pinning, and examples for other CI systems (GitLab, Jenkins), see **[docs/ci-integration.md](docs/ci-integration.md)**.
 
@@ -135,7 +159,7 @@ Detailed documentation is available in the [`docs/`](docs/) folder:
 
 ## Support
 
-For bug reports, feature requests, or questions, please open an issue on [GitHub Issues](https://github.com/GianfriAur/opcua-test-server-suite/issues).
+For bug reports, feature requests, or questions, please open an issue on [GitHub Issues](https://github.com/php-opcua/opcua-test-suite/issues).
 
 ## AI Disclosure
 
